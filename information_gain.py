@@ -48,13 +48,11 @@ def calculate_gain(S,A,a,dataset):
 
     return gain
     
-def find_information_gain(dataset):
+def find_information_gain(dataset, attributes):
     #entropy of all data
     S= find_entropy(dataset['Class'])
     gain={}
-    for attribute in dataset.columns:    
-        if(attribute=='Class'):
-            continue
+    for attribute in attributes:
         gain[attribute] = calculate_gain(S,dataset[attribute],attribute, dataset)
     return gain
 
@@ -79,90 +77,68 @@ def decision_tree(dataset, target, attributes):
     global leaf
     global node_list
     global leaf_list
-    Info_gain=find_information_gain(dataset)
-    root=Node('root')
-    root_calculated= sort_gain(Info_gain)
-    root.data= root_calculated
-    node_no= node_no+1
-    root.id=node_no
-#    print("Node number",node_no, " is:",root.data)
-    node_list.append(root)
-    #base cases
-    freq= dataset[target].value_counts()
-   
-    # if all examples are positive => there is no 0 , return single node tree with label 1
-    if (0 not in freq.keys()):
-        root.label=1
-        leaf +=1
-        leaf_list.append(root)
-#        print("Leaf number",leaf, " is:",root.data, " with label:",root.label)
-        return root
-    #if all examples negative=> no 1, return root with label 0
-    if(1 not in freq.keys()):
-        root.label=0
-        leaf +=1
-        leaf_list.append(root)
-#        print("Leaf number",leaf, " is:",root.data, " with label:",root.label)
-        return root
+    
     #if number of predicting attr is empty, then Return the single node tree Root,
     #with label = most common value of the target attribute in the examples
-    if freq[0]>freq[1]:
-        root.label=0
-    else:
+    root=Node('root')
+    node_no= node_no+1
+    root.id=node_no
+    node_list.append(root)
+     
+    freq= dataset[target].value_counts()
+    
+    # if all examples are positive => there is no 0 , return single node tree with label 1
+    if (0 not in freq.keys()):        
         root.label=1
+        leaf +=1
+        leaf_list.append(root)
+#        print("base case 1: all ex positive, return with label:",root.label)
+        return root
+    #if all examples negative=> no 1, return root with label 0
+    if(1 not in freq.keys()):        
+        root.label=0
+        leaf +=1
+        leaf_list.append(root)
+#        print("base case 2: all ex negative, return with label:",root.label)
+        return root 
     if attributes==[]:
-        if freq[0]>freq[1]:
-            root.label=0         
-            leaf +=1
-            leaf_list.append(root)
-#            print("Leaf number",leaf, " is:",root.data, " with label:",root.label)
-            return root
-        if freq[1]>freq[0]:
-            root.label=1
-            leaf +=1
-            leaf_list.append(root)
-#            print("Leaf number",leaf, " is:",root.data, " with label:",root.label)
-            return root
-    #recursive calls
+#        print("case 3: no more attributes")
+        return root
     else:
-        newNode = Node('newNode')
-        root.zero = newNode
+        Info_gain=find_information_gain(dataset, attributes)   
+        root_calculated= sort_gain(Info_gain)
+        root.data= root_calculated    
+        attributes_m= attributes[:]        
+#        print("Node number",node_no, " is:",root.data)
+        if freq[0]>freq[1]:
+            root.label=0
+        else:
+            root.label=1    
+        root.zero = Node('newNode')
         data_zero = dataset.loc[dataset[root.data]==0]
         if data_zero.empty:
-            if freq[0]>freq[1]:
-              newNode.label=0
-              leaf +=1
-              leaf_list.append(root)
-#              print("Leaf number",leaf, " is:",root.data, " with label:",root.label)
-            if freq[1]>freq[0]:
-              newNode.label=1
-              leaf +=1
-              leaf_list.append(root)
-#              print("Leaf number",leaf, " is:",root.data, " with label:",root.label)
+#          print("data empty on zero side, label should be", root.label)
+          root.zero.label= root.label
+          leaf +=1
+          leaf_list.append(root)
+          return root.zero
         else:
-            if root in attributes:
-                attributes.remove(root)
+#            print("zero side: recursing after removing attr",root.data)
+            attributes.remove(root.data)
             root.zero= decision_tree(data_zero, target, attributes)
-#            print('node:',root.data,' zero side:', root.zero.data)
-        newNode2 = Node('newNode2')
-        root.one = newNode2
+        
+        root.one = Node('newNode2')
         data_one= dataset.loc[dataset[root.data]==1]
         if data_one.empty:
-            if freq[0]>freq[1]:
-              newNode2.label=0
-              leaf +=1
-              leaf_list.append(root)
-#              print("Leaf number",leaf, " is:",root.data, " with label:",root.label)
-            if freq[1]>freq[0]:
-              newNode2.label=1
-              leaf +=1
-              leaf_list.append(root)
-#              print("Leaf number",leaf, " is:",root.data, " with label:",root.label)
+#          print("data empty on one side, label should be", root.label)
+          root.one.label= root.label
+          leaf +=1
+          leaf_list.append(root)
+          return root.one
         else:
-            if root in attributes:
-                attributes.remove(root)
-            root.one= decision_tree(data_one, target, attributes)
-#            print('node:',root.data,' one side:', root.one.data)
+#            print("one side: recursing after removing attr",root.data)
+            attributes_m.remove(root.data)
+            root.one= decision_tree(data_one, target, attributes_m)
     return root
     
 def measure_accuracy(start_node, dataset):
@@ -182,6 +158,8 @@ def measure_accuracy(start_node, dataset):
         start_node=start
         if target == predicted_target:
             correct +=1
+#        else:
+#            print("check row:",i,"",dataset.iloc[i,])
     accuracy= (correct/rows)*100     
     return accuracy
 
@@ -215,24 +193,11 @@ if __name__ == '__main__':
     root = decision_tree(training_set, 'Class', data_attributes )
     print("=========================================================")
     print("root:",root.data)
-#    print("root.left",root.zero.data," | root.right",root.one.data)
-#    l= root.zero
-#    r=root.one
-#    print(l.data," has left:",l.zero.data," | ", l.data," has right:", l.one.data)
-#    print(r.data," has left:",r.zero.data," | ", r.data," has right:", r.one.data)
-#    l1= l.zero
-#    l2=l.one
-#    r1=r.zero
-#    r2=r.one
-#    print(l1.data," has left:",l1.zero.data," | ", l1.data," has right:", l1.one.data)
-#    print(l2.data," has left:",l2.zero.data," | ", l2.data," has right:", l2.one.data)
-#    print(r1.data," has left:",r1.zero.data," | ", r1.data," has right:", r1.one.data)
-#    print(r2.data," has left:",r2.zero.data," | ", r2.data," has right:", r2.one.data)
     print("number of nodes:",node_no)
     print("number of leaf nodes:", leaf)
     non_leaf_list=node_list[:]
     for node in leaf_list:
-        non_leaf_list.remove(node)
+        non_leaf_list.remove(node)       
      
     print("=========================================================")
     print("Now measuring accuracy")
@@ -259,7 +224,7 @@ if __name__ == '__main__':
 #    tea.one = Node("new")
 #    tea.one.label=0
 
-    print_tree("",root)
+#    print_tree("",root)
     
     
     
