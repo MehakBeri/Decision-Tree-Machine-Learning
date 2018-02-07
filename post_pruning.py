@@ -12,6 +12,7 @@ import variance_impurity as vi
 from random import *
 
 def search(start,n):
+    
     if((not start) or (start.id==n.id)):
         ans = start
         return ans
@@ -40,7 +41,7 @@ def remove_from_list(id):
         
 def make_sub_nodes_list(root,a):
 #    print("root",root.id)
-    if(( root.zero) ):
+    if(( root.zero) and (root.zero.id)):
         a.append(root.zero.id)
         a.append(root.one.id)
         make_sub_nodes_list(root.zero,a)
@@ -53,7 +54,8 @@ def make_sub_nodes_list(root,a):
 
 def delete_subtree(start,toDel):
 #    h.node_no-=1
-    print("searching..",toDel.id)
+#    print("searching..",toDel.id)
+    
     node=search(start,toDel)   
     if not node:
         print("NONE returned..........................")
@@ -103,7 +105,6 @@ def post_pruning(l,k,validation_set,h):
             chosen_node = non_leaf_list[p]
 #            print("chosen subtree to be deleted starts from node:",chosen_node.data," with id:", chosen_node.id, " non-leaf:", len(non_leaf_list))
             delete_subtree(d_dash,chosen_node)
-            cn_actual = search(d_dash,chosen_node)
 #            print("after deletion, number of nodes left:",ig.node_no," now the node", cn_actual.data," has label",cn_actual.label, " non-leaf:", len(non_leaf_list))
         d_dash_accuracy = h.measure_accuracy(d_dash, validation_set)        
         print("this iteration's accuracy :", d_dash_accuracy)
@@ -124,7 +125,7 @@ if __name__ == '__main__':
     l = int(input("Enter l:"))
     k= int(input("Enter k:"))
     #heuristic
-    h=ig
+    h=vi
     root_pruned,pp_accuracy = post_pruning(l,k,validation_set,h)
     print("After pruning, the tree starting from node:",root_pruned.data,"has accuracy:", pp_accuracy,"%")
 

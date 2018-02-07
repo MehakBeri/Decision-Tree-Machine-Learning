@@ -75,8 +75,8 @@ def decision_tree(dataset, target, attributes):
     root=Node('root')
     node_no= node_no+1
     root.id=node_no
-    node_list.append(root)
-     
+#    print(root.id)
+    node_list.append(root)     
     freq= dataset[target].value_counts()
     
     # if all examples are positive => there is no 0 , return single node tree with label 1
@@ -113,6 +113,10 @@ def decision_tree(dataset, target, attributes):
           root.zero.label= root.label
           leaf +=1
           leaf_list.append(root)
+          node_no= node_no+1
+          root.zero.id=node_no
+#          print(root.id)
+          node_list.append(root.zero)
           return root.zero
         else:
 #            print("zero side: recursing after removing attr",root.data)
@@ -126,6 +130,10 @@ def decision_tree(dataset, target, attributes):
           root.one.label= root.label
           leaf +=1
           leaf_list.append(root)
+          node_no= node_no+1
+          root.one.id=node_no
+#          print(root.id)
+          node_list.append(root.one)
           return root.one
         else:
 #            print("one side: recursing after removing attr",root.data)

@@ -53,6 +53,10 @@ print("Testing accuracy on test set post pruning- info_gain..")
 r1,acc1 = pp.post_pruning(l,k,test_set,ig)
 print("After pruning, tree has accuracy:", acc1)
 
+data_attr1= training_set.columns.values
+data_attributes1= data_attr1.tolist()
+data_attributes1.remove('Class')
+pp.data_attributes=data_attributes1
 #train model using variance_impurity
 print("______________________________________________________________________") 
 print("Training model using variance_impurity..")
@@ -60,7 +64,7 @@ vi.node_no=0
 vi.leaf=0
 vi.node_list=[]
 vi.leaf_list=[]
-root_var = vi.decision_tree(training_set, 'Class', data_attributes )
+root_var = vi.decision_tree(training_set, 'Class', data_attributes1 )
 print("root:",root_var.data)
 print("number of nodes:",vi.node_no)
 print("number of leaf nodes:", vi.leaf)
