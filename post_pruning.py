@@ -16,33 +16,56 @@ def search(start,n):
         ans = start
         return ans
     else:
-        ans= search(start.zero,n)
-        if not (ans):
+        if(start.zero):
+            ans= search(start.zero,n)
+            if (ans):
+                return ans
+        if(start.one):
             ans= search(start.one,n)
-        return ans  
+            if (ans):
+                return ans
+        else:
+            ans= None 
             
 def remove_from_list(id):
     global non_leaf_list
     found=False
     for node in non_leaf_list:
-        if node.id==id:
+        if node.id==id:           
             remove_node=node
             found=True
             break
     if(found):
         non_leaf_list.remove(remove_node)
+        
+def make_sub_nodes_list(root,a):
+#    print("root",root.id)
+    if(( root.zero) ):
+        a.append(root.zero.id)
+        a.append(root.one.id)
+        make_sub_nodes_list(root.zero,a)
+        make_sub_nodes_list(root.one,a)
+    else:
+        return a
+    return a
+
+
 
 def delete_subtree(start,toDel):
 #    h.node_no-=1
+    print("searching..",toDel.id)
     node=search(start,toDel)   
     if not node:
         print("NONE returned..........................")
+        return
     if node.zero or node.one:
-        delete_subtree(start,node.zero)
-        delete_subtree(start,node.one)
-    remove_from_list(node.id)   
+        initial=[node.id]
+        l=make_sub_nodes_list(node,initial)
+        for id in l:
+            remove_from_list(id)   
     node.zero=None
     node.one=None
+    return
     
 def post_pruning(l,k,validation_set,h):
     print('constructing the decision tree....')

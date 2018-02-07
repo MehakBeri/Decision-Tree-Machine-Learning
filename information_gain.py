@@ -83,6 +83,7 @@ def decision_tree(dataset, target, attributes):
     root=Node('root')
     node_no= node_no+1
     root.id=node_no
+#    print(root.id)
     node_list.append(root)     
     freq= dataset[target].value_counts()
     
@@ -122,6 +123,7 @@ def decision_tree(dataset, target, attributes):
           leaf_list.append(root)
           node_no= node_no+1
           root.zero.id=node_no
+#          print(root.id)
           node_list.append(root.zero)
           return root.zero
         else:
@@ -138,6 +140,7 @@ def decision_tree(dataset, target, attributes):
           leaf_list.append(root)
           node_no= node_no+1
           root.one.id=node_no
+#          print(root.id)
           node_list.append(root.one)
           return root.one
         else:
@@ -211,23 +214,32 @@ if __name__ == '__main__':
     print("Accuracy on this dataset is:",m,"%")
     
 #test tree
-#    wesley= Node("Wesley")
-#    honor = Node("Honor")
-#    barcly= Node("Barcly")
-#    tea= Node("Tea")
-#    wesley.zero=honor
-#    wesley.one= Node("new")
-#    wesley.one.label = 0
-#    honor.zero=barcly
-#    honor.one=tea
-#    barcly.zero = Node("new")
-#    barcly.zero.label=1
-#    barcly.one = Node("new")
-#    barcly.one.label=0
-#    tea.zero = Node("new")
-#    tea.zero.label=1
-#    tea.one = Node("new")
-#    tea.one.label=0
+    wesley= Node("Wesley")
+    wesley.id=1
+    honor = Node("Honor")
+    honor.id=2
+    barcly= Node("Barcly")
+    barcly.id=3
+    tea= Node("Tea")
+    tea.id=4
+    wesley.zero=honor
+    wesley.one= Node("new")
+    wesley.one.label = 0
+    wesley.one.id=5
+    honor.zero=barcly
+    honor.one=tea
+    barcly.zero = Node("new")
+    barcly.zero.label=1
+    barcly.zero.id=6
+    barcly.one = Node("new")
+    barcly.one.label=0
+    barcly.one.id=7
+    tea.zero = Node("new")
+    tea.zero.label=1
+    tea.zero.id=8
+    tea.one = Node("new")
+    tea.one.label=0
+    tea.one.id=9
 
     print_tree("",root)
     
