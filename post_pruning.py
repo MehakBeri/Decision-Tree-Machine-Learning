@@ -55,10 +55,9 @@ def make_sub_nodes_list(root,a):
 def delete_subtree(start,toDel):
 #    h.node_no-=1
 #    print("searching..",toDel.id)
-    
     node=search(start,toDel)   
     if not node:
-        print("NONE returned..........................")
+#        print("NONE returned..........................")
         return
     if node.zero or node.one:
         initial=[node.id]
@@ -70,7 +69,7 @@ def delete_subtree(start,toDel):
     return
     
 def post_pruning(l,k,validation_set,h):
-    print('constructing the decision tree....')
+#    print('constructing the decision tree....')
     h.node_no=0
     h.leaf=0
     h.node_list=[]
@@ -99,7 +98,7 @@ def post_pruning(l,k,validation_set,h):
         for j in range(1,m+1):
             n=len(non_leaf_list)
             if n<2:
-                print("out of non leaf nodes!!")
+#                print("out of non leaf nodes!!")
                 break
             p=randint(1, n-1)            
             chosen_node = non_leaf_list[p]
@@ -107,7 +106,7 @@ def post_pruning(l,k,validation_set,h):
             delete_subtree(d_dash,chosen_node)
 #            print("after deletion, number of nodes left:",ig.node_no," now the node", cn_actual.data," has label",cn_actual.label, " non-leaf:", len(non_leaf_list))
         d_dash_accuracy = h.measure_accuracy(d_dash, validation_set)        
-        print("this iteration's accuracy :", d_dash_accuracy)
+#        print("this iteration's accuracy :", d_dash_accuracy)
         non_leaf_list=nl_list[:] #replenish list
         if d_dash_accuracy > d_best_accuracy:
 #            print("it is better!")
