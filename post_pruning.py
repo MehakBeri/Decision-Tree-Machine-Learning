@@ -16,16 +16,10 @@ def search(start,n):
         ans = start
         return ans
     else:
-        if(start.zero):
-            ans= search(start.zero,n)
-            if (ans):
-                return ans
-        if(start.one):
+        ans= search(start.zero,n)
+        if not (ans):
             ans= search(start.one,n)
-            if (ans):
-                return ans
-        else:
-            ans= None   
+        return ans  
             
 def remove_from_list(id):
     global non_leaf_list
@@ -40,36 +34,15 @@ def remove_from_list(id):
 
 def delete_subtree(start,toDel):
 #    h.node_no-=1
-    node=search(start,toDel)    
+    node=search(start,toDel)   
+    if not node:
+        print("NONE returned..........................")
     if node.zero or node.one:
         delete_subtree(start,node.zero)
         delete_subtree(start,node.one)
-        remove_from_list(node.id)   
+    remove_from_list(node.id)   
     node.zero=None
     node.one=None
-
-#def delete_subtree(start,toDel):
-#    ig.node_no-=1
-#    global non_leaf_list
-#    non_leaf_list.remove(toDel)
-#    node=search(start,toDel)
-#    if(node):
-#        node.zero=None
-#        node.one=None
-        
-#       =======================================       
-#    if node.zero or node.one:
-#        delete_subtree(start,node.zero)
-#        delete_subtree(start,node.one)
-#        print("deleting node with id:",node.id," and data",node.data)
-#        node=None
-#        if search(start,toDel):
-#            print("not deleted yet")
-#    else:
-#        print("deleting node with id:",node.id," and data",node.data)
-#        node=None
-#        if search(start,toDel):
-#            print("not deleted yet")
     
 def post_pruning(l,k,validation_set,h):
     print('constructing the decision tree....')
@@ -77,8 +50,11 @@ def post_pruning(l,k,validation_set,h):
     h.leaf=0
     h.node_list=[]
     h.leaf_list=[]
+    data_attr1= training_set.columns.values
+    data_attributes1= data_attr1.tolist()
+    data_attributes1.remove('Class')
     global non_leaf_list
-    d = h.decision_tree(training_set, 'Class', data_attributes )
+    d = h.decision_tree(training_set, 'Class', data_attributes1 )
     d_best = d
     d_best_accuracy = h.measure_accuracy(d_best, validation_set)
     print("initial accuracy:", d_best_accuracy)
@@ -89,7 +65,11 @@ def post_pruning(l,k,validation_set,h):
         nl_list.remove(node)
     for iterator in range(0,l):
         h.node_no=0
-        d_dash = h.decision_tree(training_set, 'Class', data_attributes )
+        data_attr= training_set.columns.values
+        data_at= data_attr.tolist()
+        data_at.remove('Class')
+        d_dash = h.decision_tree(training_set, 'Class', data_at )
+#        print("this one")
         m=randint(1, k)
         for j in range(1,m+1):
             n=len(non_leaf_list)
@@ -103,7 +83,7 @@ def post_pruning(l,k,validation_set,h):
             cn_actual = search(d_dash,chosen_node)
 #            print("after deletion, number of nodes left:",ig.node_no," now the node", cn_actual.data," has label",cn_actual.label, " non-leaf:", len(non_leaf_list))
         d_dash_accuracy = h.measure_accuracy(d_dash, validation_set)        
-#        print("this iteration's accuracy :", d_dash_accuracy)
+        print("this iteration's accuracy :", d_dash_accuracy)
         non_leaf_list=nl_list[:] #replenish list
         if d_dash_accuracy > d_best_accuracy:
 #            print("it is better!")
